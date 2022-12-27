@@ -1,0 +1,43 @@
+version: '3'
+services:
+  ingress:
+    build: ./ingress/
+    ports:
+      - 80:80
+    image: ingress
+    volumes:
+      - static:/static
+    restart: on-failure
+    depends_on:
+      - backend
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: '${DB_NAME}'
+      POSTGRES_USER: '${DB_USER}'
+      POSTGRES_PASSWORD: '${DB_PASSWORD}'
+
+  backend:
+    image: backend
+    volumes:
+      - static:/app/static
+    build: ./backend
+    container_name: django
+    environment:
+      SECRET_KEY: '${SECRET_KEY}'
+      DB_NAME: '${DB_NAME}'
+      DB_USER: '${DB_USER}'
+      DB_PASSWORD: '${DB_PASSWORD}'
+      DB_PORT: '5432'
+      DB_HOST: db
+      DJANGO_SUPERUSER_USERNAME: '${DJANGO_SUPERUSER_USERNAME}'
+      DJANGO_SUPERUSER_PASSWORD: '${DJANGO_SUPERUSER_PASSWORD}'
+      DJANGO_SUPERUSER_EMAIL: '${DJANGO_SUPERUSER_EMAIL}'
+    restart: on-failure
+    entrypoint: ./start.sh
+    depends_on:
+      - db
+
+volumes:
+  static:
