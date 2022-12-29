@@ -39,5 +39,19 @@ services:
     depends_on:
       - db
 
+  api:
+    image: api
+    build: ./api
+    environment:
+      DB_NAME: '${DB_NAME}'
+      DB_USER: '${DB_USER}'
+      DB_PASSWORD: '${DB_PASSWORD}'
+      DB_PORT: '5432'
+      DB_HOST: db
+    restart: on-failure
+    entrypoint: ./start.sh
+    depends_on:
+      - db
+
 volumes:
   static:
